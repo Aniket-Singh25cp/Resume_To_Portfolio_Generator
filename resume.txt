@@ -1,0 +1,18 @@
+Aarav Mehta
+Python Developer & Data Engineering Student
+
+Computer science student focused on Python, databases and practical data engineering projects.
+
+Skills
+Python, SQL, DBMS, HTML, JavaScript, Git
+
+Education
+B.Tech, GLA University, 2024-2028
+
+Projects
+Resume Portfolio Generator — A Python application that converts resume text into a structured portfolio. Technologies: Python, Gemini API, HTML, CSS.
+Database Practice Suite — SQL and DBMS practice work covering joins and normalization. Technologies: SQL, DBMS.
+
+Contact
+Email: aarav@example.com
+Availability: Open to internships

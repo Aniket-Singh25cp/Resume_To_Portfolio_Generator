@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="{{THEME}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{NAME}} — {{HEADLINE}}">
+  <title>{{NAME}} — Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Theme Switcher Floating Dropdown -->
+  <div class="theme-dropdown-wrap">
+    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Change theme" aria-expanded="false" aria-haspopup="true">
+      <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+      </svg>
+      <span>Theme</span>
+      <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="theme-menu" id="themeMenu" role="menu">
+      <button type="button" class="theme-option" data-theme-option="vivid">Vivid</button>
+      <button type="button" class="theme-option" data-theme-option="bold">Bold</button>
+      <button type="button" class="theme-option" data-theme-option="editorial">Editorial</button>
+      <button type="button" class="theme-option" data-theme-option="dark">Dark</button>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Back to top">
+      <span class="brand-mark">{{NAME}}</span>
+      <small>portfolio / {{YEAR}}</small>
+    </a>
+    <nav class="main-nav" aria-label="Primary navigation">{{NAV}}</nav>
+    <div class="header-side">{{BADGE}}</div>
+  </header>
+
+  <main>
+    <section id="home" class="hero" data-section="home">
+      <div class="hero-copy">
+        <h1>{{NAME}}</h1>
+        <p class="hero-headline">{{HEADLINE}}</p>
+        <div class="hero-actions"><a href="#projects" class="hero-link">Explore work <span>↘</span></a></div>
+      </div>
+      <div class="hero-visual">{{HERO_VISUAL}}</div>
+    </section>
+    {{SECTIONS}}
+  </main>
+
+  <footer class="site-footer"><span>{{NAME}}</span><span>Built from resume data · {{YEAR}}</span></footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const saved = localStorage.getItem('portfolio-theme');
+      const initial = saved || root.dataset.theme || 'vivid';
+      root.dataset.theme = initial;
+
+      // Dropdown Theme Switcher logic
+      const toggleBtn = document.getElementById('themeToggleBtn');
+      const themeMenu = document.getElementById('themeMenu');
+      const themeOptions = document.querySelectorAll('[data-theme-option]');
+
+      const updateActiveThemeUI = (theme) => {
+        themeOptions.forEach(btn => {
+          btn.classList.toggle('is-selected', btn.dataset.themeOption === theme);
+        });
+      };
+      updateActiveThemeUI(initial);
+
+      const toggleMenu = (shouldOpen) => {
+        const isOpen = shouldOpen !== undefined ? shouldOpen : !themeMenu.classList.contains('is-open');
+        themeMenu.classList.toggle('is-open', isOpen);
+        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      };
+
+      // Open / Close on toggle button click
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.theme-dropdown-wrap')) {
+          toggleMenu(false);
+        }
+      });
+
+      // Switch theme on option click & close menu
+      themeOptions.forEach(button => {
+        button.addEventListener('click', () => {
+          const theme = button.dataset.themeOption;
+          root.dataset.theme = theme;
+          localStorage.setItem('portfolio-theme', theme);
+          updateActiveThemeUI(theme);
+          toggleMenu(false);
+        });
+      });
+
+      // Navigation highlighting on scroll
+      const navLinks = [...document.querySelectorAll('[data-nav]')];
+      const sections = [...document.querySelectorAll('[data-section]')];
+      const updateNav = () => {
+        const marker = window.scrollY + window.innerHeight * 0.28;
+        let current = 'home';
+        sections.forEach(section => { if (section.offsetTop <= marker) current = section.id; });
+        navLinks.forEach(link => link.classList.toggle('is-active', link.dataset.nav === current));
+      };
+      window.addEventListener('scroll', updateNav, { passive: true });
+      window.addEventListener('resize', updateNav);
+      updateNav();
+
+      // Project filter buttons
+      const filterButtons = [...document.querySelectorAll('.filter-btn')];
+      const cards = [...document.querySelectorAll('.project-card')];
+      const emptyFilter = document.querySelector('.empty-filter');
+      filterButtons.forEach(button => button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        filterButtons.forEach(item => item.classList.toggle('is-active', item === button));
+        let visible = 0;
+        cards.forEach(card => {
+          const tags = card.dataset.projectTags || '';
+          const show = filter === 'all' || tags.split('|').includes(filter);
+          card.hidden = !show;
+          if (show) visible += 1;
+        });
+        if (emptyFilter) emptyFilter.hidden = visible !== 0;
+      }));
+    })();
+  </script>
+</body>
+</html>
