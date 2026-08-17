@@ -236,7 +236,7 @@ See `AI_USAGE_LOG.md` for the required record of tools, prompts, generated mater
 
 ## Submission checklist
 
-- [ ] Public or instructor-accessible GitHub repository
+- [X] Public or instructor-accessible GitHub repository
 - [ ] `main.py`, `resume.txt`, `template.html`, `style.css`, `requirements.txt`
 - [ ] `.gitignore` and `.env.example`
 - [ ] No real `.env` or API key committed
