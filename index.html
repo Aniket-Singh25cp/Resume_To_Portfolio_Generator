@@ -110,6 +110,7 @@
     function showError(msg) {
       errorBox.textContent = msg;
       errorBox.hidden = false;
+      statusBox.hidden = true;
     }
     function clearError() {
       errorBox.hidden = true;
@@ -135,14 +136,12 @@
         });
 
         const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || 'Generation failed');
+        if (!response.ok || !data.html) {
+          throw new Error(data.error || 'Generation failed. Check server logs.');
         }
 
-        // Render purely in memory via Blob URL (ephemeral session)
-        const blob = new Blob([data.html], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        portfolioFrame.src = blobUrl;
+        // Use srcdoc instead of Blob URL to prevent browser iframe crashes
+        portfolioFrame.srcdoc = data.html;
 
         creatorApp.hidden = true;
         portfolioViewer.hidden = false;
@@ -162,7 +161,7 @@
     exitViewerBtn.addEventListener('click', () => {
       portfolioViewer.hidden = true;
       creatorApp.hidden = false;
-      portfolioFrame.src = 'about:blank'; // Clear memory
+      portfolioFrame.srcdoc = ''; // Reset memory
     });
   </script>
 </body>

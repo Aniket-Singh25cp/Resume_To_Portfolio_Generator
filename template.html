@@ -56,7 +56,12 @@
   <script>
     (() => {
       const root = document.documentElement;
-      const saved = localStorage.getItem('portfolio-theme');
+      let saved = null;
+      try {
+        saved = localStorage.getItem('portfolio-theme');
+      } catch (e) {
+        // Fallback for sandboxed iframe environments
+      }
       const initial = saved || root.dataset.theme || 'vivid';
       root.dataset.theme = initial;
 
@@ -70,39 +75,38 @@
           btn.classList.toggle('is-selected', btn.dataset.themeOption === theme);
         });
       };
-      updateActiveThemeUI(initial);
+      if (toggleBtn && themeMenu) {
+        updateActiveThemeUI(initial);
 
-      const toggleMenu = (shouldOpen) => {
-        const isOpen = shouldOpen !== undefined ? shouldOpen : !themeMenu.classList.contains('is-open');
-        themeMenu.classList.toggle('is-open', isOpen);
-        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      };
+        const toggleMenu = (shouldOpen) => {
+          const isOpen = shouldOpen !== undefined ? shouldOpen : !themeMenu.classList.contains('is-open');
+          themeMenu.classList.toggle('is-open', isOpen);
+          toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
 
-      // Open / Close on toggle button click
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.theme-dropdown-wrap')) {
-          toggleMenu(false);
-        }
-      });
-
-      // Switch theme on option click & close menu
-      themeOptions.forEach(button => {
-        button.addEventListener('click', () => {
-          const theme = button.dataset.themeOption;
-          root.dataset.theme = theme;
-          localStorage.setItem('portfolio-theme', theme);
-          updateActiveThemeUI(theme);
-          toggleMenu(false);
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMenu();
         });
-      });
 
-      // Navigation highlighting on scroll
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.theme-dropdown-wrap')) {
+            toggleMenu(false);
+          }
+        });
+
+        themeOptions.forEach(button => {
+          button.addEventListener('click', () => {
+            const theme = button.dataset.themeOption;
+            root.dataset.theme = theme;
+            try { localStorage.setItem('portfolio-theme', theme); } catch (e) {}
+            updateActiveThemeUI(theme);
+            toggleMenu(false);
+          });
+        });
+      }
+
+      // Nav scroll highlighting
       const navLinks = [...document.querySelectorAll('[data-nav]')];
       const sections = [...document.querySelectorAll('[data-section]')];
       const updateNav = () => {
@@ -115,7 +119,7 @@
       window.addEventListener('resize', updateNav);
       updateNav();
 
-      // Project filter buttons
+      // Project filter
       const filterButtons = [...document.querySelectorAll('.filter-btn')];
       const cards = [...document.querySelectorAll('.project-card')];
       const emptyFilter = document.querySelector('.empty-filter');

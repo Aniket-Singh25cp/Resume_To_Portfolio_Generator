@@ -182,40 +182,52 @@ textarea {
 .portfolio-viewer {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 1000;
-  background: #000;
+  background: #111;
   display: flex;
   flex-direction: column;
 }
+
 .viewer-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background: #111;
-  border-bottom: 1px solid #222;
+  padding: 12px 24px;
+  background: #16181f;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  height: 52px;
+  box-sizing: border-box;
 }
+
 .viewer-title {
   font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  color: #888;
+  font-size: 0.78rem;
+  color: #b8ff36;
 }
+
 .viewer-btn {
-  background: transparent;
-  border: 1px solid #444;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 6px;
   font-size: 0.8rem;
+  font-family: inherit;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
-.viewer-btn:hover { background: #222; }
+.viewer-btn:hover {
+  background: #b8ff36;
+  color: #000;
+  border-color: #b8ff36;
+}
+
 #portfolioFrame {
   flex: 1;
   width: 100%;
+  height: calc(100vh - 52px);
   border: 0;
-}
-
-@media (max-width: 600px) {
-  .option-grid { grid-template-columns: 1fr; }
+  background: #fff; /* fallback */
 }
