@@ -45,14 +45,30 @@ class handler(BaseHTTPRequestHandler):
             
             # 2. AI Request
             api_key = os.environ.get("GEMINI_API_KEY")
+            if not api_key:
+                raise RuntimeError("GEMINI_API_KEY is not set in Vercel Environment Variables")
+
+            # Using the new Google GenAI SDK correctly
             client = genai.Client(api_key=api_key)
+            
+            # CHANGE: Use 'gemini-1.5-flash' without the 'models/' prefix 
+            # or try 'gemini-1.5-flash-latest' which is often more stable on Vercel
+            model_id = "gemini-1.5-flash" 
+            
             prompt = f"Return ONLY JSON. Use ONLY the provided resume to fill: name, headline, summary, skills[], education[degree, institution, dates], experience[role, company, dates, details[]], projects[title, description, technologies[], link], contact{{email, linkedin, github}}. Resume:\n{resume_text}"
             
             response = client.models.generate_content(
-                model="gemini-1.5-flash",
+                model=model_id,
                 contents=prompt,
-                config=types.GenerateContentConfig(response_mime_type="application/json")
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.1 # Lower temperature for more stable JSON
+                )
             )
+            
+            if not response.text:
+                raise RuntimeError("Gemini returned an empty response. Check your API quota.")
+                
             data = json.loads(response.text)
 
             # 3. Build Sections
