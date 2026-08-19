@@ -53,7 +53,7 @@ class handler(BaseHTTPRequestHandler):
             
             # CHANGE: Use 'gemini-1.5-flash' without the 'models/' prefix 
             # or try 'gemini-1.5-flash-latest' which is often more stable on Vercel
-            model_id = "gemini-3.7-flash" 
+            model_id = "gemini-3.5-flash" 
             
             prompt = f"Return ONLY JSON. Use ONLY the provided resume to fill: name, headline, summary, skills[], education[degree, institution, dates], experience[role, company, dates, details[]], projects[title, description, technologies[], link], contact{{email, linkedin, github}}. Resume:\n{resume_text}"
             
