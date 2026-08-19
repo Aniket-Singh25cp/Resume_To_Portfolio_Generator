@@ -3,166 +3,84 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Resume Portfolio Generator</title>
+  <title>AI Portfolio Generator</title>
   <link rel="stylesheet" href="launcher.css">
 </head>
 <body>
-  <!-- Launcher / Creator Interface -->
+  <!-- Landing Page -->
   <div id="creatorApp" class="creator-container">
     <header class="launcher-header">
-      <div class="badge">AIML GLA Bootcamp '26</div>
-      <h1>AI Resume to Portfolio Generator</h1>
-      <p>Convert any plain-text resume into an interactive, multi-themed portfolio website instantly using Google Gemini.</p>
+      <div class="badge">Bootcamp Project '26</div>
+      <h1>AI Resume to Portfolio</h1>
+      <p>Landing page to generate your instant portfolio.</p>
     </header>
 
     <main class="launcher-card">
-      <!-- Option Tabs / Choice -->
       <div class="option-grid">
-        <button type="button" class="default-btn" id="useDefaultBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <div>
-            <strong>Use Default Resume</strong>
-            <span>Generate directly from repository's resume.txt</span>
-          </div>
-        </button>
-
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="fileInput" accept=".txt" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <p><strong>Drag & Drop your resume (.txt)</strong> or <span class="browse-link">browse</span></p>
-        </div>
+        <button id="useDefaultBtn" class="default-btn">Use Default Resume</button>
+        <div class="drop-zone">Drag & Drop .txt here</div>
       </div>
-
-      <div class="divider"><span>OR PASTE TEXT</span></div>
-
-      <textarea id="resumeInput" placeholder="Paste your raw resume text here... (minimum 50 characters)"></textarea>
-
-      <div class="actions">
-        <button type="button" class="submit-btn" id="generateBtn">
-          <span>Generate Portfolio</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
-
-      <!-- Loading and status messages -->
-      <div id="statusBox" class="status-box" hidden>
-        <div class="spinner"></div>
-        <span id="statusText">Analyzing resume structure with Gemini API...</span>
-      </div>
-      <div id="errorBox" class="error-box" hidden></div>
+      <textarea id="resumeInput" placeholder="Paste resume text here..."></textarea>
+      <button id="generateBtn" class="submit-btn">Generate Portfolio</button>
+      <div id="statusBox" class="status-box" hidden>AI is working...</div>
     </main>
-
-    <footer class="launcher-footer">
-      <span>Ephemeral Session: Generated portfolios exist only in browser memory and reset on exit.</span>
-    </footer>
   </div>
 
-  <!-- Fullscreen Live Portfolio Modal/Iframe View -->
+  <!-- Hidden Portfolio Preview -->
   <div id="portfolioViewer" class="portfolio-viewer" hidden>
     <div class="viewer-bar">
-      <span class="viewer-title">Ephemeral Live Portfolio Preview</span>
-      <div class="viewer-actions">
-        <button type="button" id="exitViewerBtn" class="viewer-btn">← Back to Generator</button>
-      </div>
+      <span>Live Preview</span>
+      <button id="exitViewerBtn" class="viewer-btn">← Back to Generator</button>
     </div>
-    <iframe id="portfolioFrame" title="Generated Portfolio"></iframe>
+    <iframe id="portfolioFrame"></iframe>
   </div>
 
   <script>
-    const useDefaultBtn = document.getElementById('useDefaultBtn');
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const resumeInput = document.getElementById('resumeInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const statusBox = document.getElementById('statusBox');
-    const errorBox = document.getElementById('errorBox');
     const creatorApp = document.getElementById('creatorApp');
     const portfolioViewer = document.getElementById('portfolioViewer');
     const portfolioFrame = document.getElementById('portfolioFrame');
     const exitViewerBtn = document.getElementById('exitViewerBtn');
+    const generateBtn = document.getElementById('generateBtn');
 
-    // Drag & Drop handlers
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
-      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length) handleFile(e.target.files[0]);
-    });
-
-    function handleFile(file) {
-      if (!file.name.endsWith('.txt')) {
-        showError('Please upload a plain text (.txt) file.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        resumeInput.value = e.target.result;
-        clearError();
-      };
-      reader.readAsText(file);
-    }
-
-    function showError(msg) {
-      errorBox.textContent = msg;
-      errorBox.hidden = false;
-      statusBox.hidden = true;
-    }
-    function clearError() {
-      errorBox.hidden = true;
-    }
-
-    async function generatePortfolio(useDefault = false) {
-      clearError();
-      const text = resumeInput.value.trim();
-      if (!useDefault && text.length < 50) {
-        showError('Please provide at least 50 characters of resume text or select the default resume.');
-        return;
-      }
-
-      statusBox.hidden = false;
-      generateBtn.disabled = true;
-      useDefaultBtn.disabled = true;
-
-      try {
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resume_text: text, use_default: useDefault })
-        });
-
-        const data = await response.json();
-        if (!response.ok || !data.html) {
-          throw new Error(data.error || 'Generation failed. Check server logs.');
-        }
-
-        // Use srcdoc instead of Blob URL to prevent browser iframe crashes
-        portfolioFrame.srcdoc = data.html;
-
-        creatorApp.hidden = true;
-        portfolioViewer.hidden = false;
-
-      } catch (err) {
-        showError(err.message);
-      } finally {
-        statusBox.hidden = true;
-        generateBtn.disabled = false;
-        useDefaultBtn.disabled = false;
-      }
-    }
-
-    useDefaultBtn.addEventListener('click', () => generatePortfolio(true));
-    generateBtn.addEventListener('click', () => generatePortfolio(false));
-
+    // FIX: BACK TO GENERATOR
     exitViewerBtn.addEventListener('click', () => {
       portfolioViewer.hidden = true;
       creatorApp.hidden = false;
-      portfolioFrame.srcdoc = ''; // Reset memory
+      portfolioFrame.srcdoc = '';
     });
+
+    async function handleGenerate(useDefault = false) {
+      const statusBox = document.getElementById('statusBox');
+      statusBox.hidden = false;
+      generateBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            use_default: useDefault,
+            resume_text: document.getElementById('resumeInput').value
+          })
+        });
+        const data = await res.json();
+        if (data.html) {
+          creatorApp.hidden = true;
+          portfolioViewer.hidden = false;
+          portfolioFrame.srcdoc = data.html;
+        } else {
+          alert(data.error);
+        }
+      } catch (e) {
+        alert("Failed to connect to API");
+      } finally {
+        statusBox.hidden = true;
+        generateBtn.disabled = false;
+      }
+    }
+
+    generateBtn.addEventListener('click', () => handleGenerate(false));
+    document.getElementById('useDefaultBtn').addEventListener('click', () => handleGenerate(true));
   </script>
 </body>
 </html>
