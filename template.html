@@ -1,85 +1,26 @@
 <!doctype html>
 <html lang="en" data-theme="{{THEME}}">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="{{NAME}} — {{HEADLINE}}" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{NAME}} — Portfolio</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
     <div class="grain" aria-hidden="true"></div>
-
-    <!-- Theme Switcher Floating Dropdown -->
     <div class="theme-dropdown-wrap">
-      <button
-        type="button"
-        class="theme-toggle-btn"
-        id="themeToggleBtn"
-        aria-label="Change theme"
-        aria-expanded="false"
-        aria-haspopup="true"
-      >
-        <svg
-          class="theme-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2" />
-          <path d="M12 20v2" />
-          <path d="m4.93 4.93 1.41 1.41" />
-          <path d="m17.66 17.66 1.41 1.41" />
-          <path d="M2 12h2" />
-          <path d="M20 12h2" />
-          <path d="m6.34 17.66-1.41 1.41" />
-          <path d="m19.07 4.93-1.41 1.41" />
-        </svg>
-        <span>Theme</span>
-        <svg
-          class="chevron-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-      <div class="theme-menu" id="themeMenu" role="menu">
-        <button type="button" class="theme-option" data-theme-option="vivid">
-          Vivid
-        </button>
-        <button type="button" class="theme-option" data-theme-option="bold">
-          Bold
-        </button>
-        <button
-          type="button"
-          class="theme-option"
-          data-theme-option="editorial"
-        >
-          Editorial
-        </button>
-        <button type="button" class="theme-option" data-theme-option="dark">
-          Dark
-        </button>
+      <button type="button" class="theme-toggle-btn" id="themeToggleBtn">Theme</button>
+      <div class="theme-menu" id="themeMenu">
+        <button type="button" class="theme-option" data-theme-option="vivid">Vivid</button>
+        <button type="button" class="theme-option" data-theme-option="bold">Bold</button>
+        <button type="button" class="theme-option" data-theme-option="editorial">Editorial</button>
+        <button type="button" class="theme-option" data-theme-option="dark">Dark</button>
       </div>
     </div>
 
     <header class="site-header">
-      <a class="brand" href="#home" aria-label="Back to top">
-        <span class="brand-mark">{{NAME}}</span>
-        <small>portfolio / {{YEAR}}</small>
-      </a>
-      <nav class="main-nav" aria-label="Primary navigation">{{NAV}}</nav>
+      <a class="brand" href="#home"><span class="brand-mark">{{NAME}}</span></a>
+      <nav class="main-nav">{{NAV}}</nav>
       <div class="header-side">{{BADGE}}</div>
     </header>
 
@@ -88,90 +29,65 @@
         <div class="hero-copy">
           <h1>{{NAME}}</h1>
           <p class="hero-headline">{{HEADLINE}}</p>
-          <div class="hero-actions">
-            <a href="#projects" class="hero-link"
-              >Explore work <span>↘</span></a
-            >
-          </div>
+          <a href="#projects" class="hero-link">Explore work ↘</a>
         </div>
         <div class="hero-visual">{{HERO_VISUAL}}</div>
       </section>
       {{SECTIONS}}
     </main>
 
-    <footer class="site-footer">
-      <span>{{NAME}}</span><span>Built from resume data · {{YEAR}}</span>
-    </footer>
-
     <script>
       (() => {
         const root = document.documentElement;
-        // BRIDGE: Tell the parent bar to change theme
-        const syncThemeWithParent = (theme) => {
-          window.parent.postMessage(
-            { type: "THEME_UPDATE", theme: theme },
-            "*",
-          );
+
+        // THE BRIDGE: Notify parent bar when theme changes
+        const syncWithParent = (theme) => {
+          window.parent.postMessage({ type: "THEME_UPDATE", theme: theme }, "*");
         };
 
-        // 1. THE NAVIGATION FIX: Handle links inside the iframe safely
+        // Internal Navigation Fix
         document.addEventListener("click", (e) => {
           const link = e.target.closest('a[href^="#"]');
           if (link) {
             e.preventDefault();
             const targetId = link.getAttribute("href").slice(1);
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-              targetEl.scrollIntoView({ behavior: "smooth" });
-            }
+            const el = document.getElementById(targetId);
+            if (el) el.scrollIntoView({ behavior: "smooth" });
           }
         });
 
-        // 2. Theme Dropdown Logic
+        // Theme Switcher
         const toggleBtn = document.getElementById("themeToggleBtn");
         const themeMenu = document.getElementById("themeMenu");
-        const themeOptions = document.querySelectorAll("[data-theme-option]");
+        const themeOptions = document.querySelectorAll(".theme-option");
 
         if (toggleBtn && themeMenu) {
-          toggleBtn.onclick = (e) => {
-            e.stopPropagation();
-            themeMenu.classList.toggle("is-open");
-          };
+          toggleBtn.onclick = (e) => { e.stopPropagation(); themeMenu.classList.toggle("is-open"); };
           document.onclick = () => themeMenu.classList.remove("is-open");
 
           themeOptions.forEach((opt) => {
             opt.onclick = () => {
               const theme = opt.dataset.themeOption;
               root.dataset.theme = theme;
-              syncThemeWithParent(theme); // Notify top bar
-              try {
-                localStorage.setItem("portfolio-theme", theme);
-              } catch (e) {}
+              syncWithParent(theme);
+              try { localStorage.setItem("portfolio-theme", theme); } catch (e) {}
             };
           });
-          // Initial Sync on Load
-          const initialTheme = root.dataset.theme || "vivid";
-          syncThemeWithParent(initialTheme);
         }
+        
+        // Initial theme sync
+        syncWithParent(root.dataset.theme || 'vivid');
 
-        // 3. Scroll Watcher for Active Nav state
+        // Scroll State
         const navLinks = [...document.querySelectorAll("[data-nav]")];
         const sections = [...document.querySelectorAll("section[id]")];
-        window.addEventListener(
-          "scroll",
-          () => {
-            let current = "home";
+        window.addEventListener("scroll", () => {
+            let current = 'home';
             const marker = window.scrollY + 100;
-            sections.forEach((s) => {
-              if (s.offsetTop <= marker) current = s.id;
-            });
-            navLinks.forEach((l) =>
-              l.classList.toggle("is-active", l.dataset.nav === current),
-            );
-          },
-          { passive: true },
-        );
+            sections.forEach(s => { if (s.offsetTop <= marker) current = s.id; });
+            navLinks.forEach(l => l.classList.toggle('is-active', l.dataset.nav === current));
+        }, { passive: true });
       })();
     </script>
-  </body>
+</body>
 </html>

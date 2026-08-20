@@ -42,7 +42,6 @@
     </main>
   </div>
 
-  <!-- Note: data-viewer-theme will be updated by JS -->
   <div id="portfolioViewer" class="portfolio-viewer" data-viewer-theme="vivid" hidden>
     <div class="viewer-bar">
       <div class="viewer-left"><span class="live-indicator"></span><span>Live Portfolio</span></div>
@@ -55,7 +54,7 @@
     let useDefaultMode = false;
     const portfolioViewer = document.getElementById('portfolioViewer');
 
-    // Theme Sync Listener: Listens to the iframe
+    // Theme Sync Listener: Catch theme changes from the iframe
     window.addEventListener('message', (event) => {
       if (event.data.type === 'THEME_UPDATE') {
         portfolioViewer.dataset.viewerTheme = event.data.theme;
@@ -81,6 +80,7 @@
     document.getElementById('exitViewerBtn').onclick = () => {
       portfolioViewer.hidden = true;
       document.getElementById('creatorApp').hidden = false;
+      document.getElementById('portfolioFrame').srcdoc = '';
     };
 
     async function generate() {
@@ -88,7 +88,6 @@
       const generateBtn = document.getElementById('generateBtn');
       const statusBox = document.getElementById('statusBox');
       errorBox.hidden = true;
-      
       statusBox.hidden = false;
       generateBtn.disabled = true;
 
@@ -104,6 +103,7 @@
 
         const data = await response.json();
         if (data.html) {
+          portfolioViewer.dataset.viewerTheme = data.theme; // Set initial bar color
           document.getElementById('portfolioFrame').srcdoc = data.html;
           document.getElementById('creatorApp').hidden = true;
           portfolioViewer.hidden = false;
@@ -118,7 +118,6 @@
         generateBtn.disabled = false;
       }
     }
-
     generateBtn.onclick = generate;
   </script>
 </body>
