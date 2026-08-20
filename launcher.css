@@ -287,3 +287,19 @@ textarea {
   text-align: center;
   margin-bottom: 20px;
 }
+
+.section-contact { padding: 8rem 7vw; }
+.contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: start; }
+.contact-desc { color: var(--muted); margin-top: 1rem; font-size: 1.1rem; }
+.contact-links { display: grid; gap: 12px; }
+.contact-link { 
+    display: flex; align-items: center; gap: 15px; padding: 18px; 
+    border: 1px solid var(--line); background: var(--surface); 
+    font-family: var(--mono); font-size: 0.9rem; transition: all 0.2s;
+}
+.contact-link:hover { background: var(--text); color: var(--bg); transform: translateX(5px); }
+.contact-link svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+@media (max-width: 800px) {
+    .contact-wrap { grid-template-columns: 1fr; }
+}

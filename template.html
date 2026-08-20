@@ -56,86 +56,51 @@
   <script>
     (() => {
       const root = document.documentElement;
-      let saved = null;
-      try {
-        saved = localStorage.getItem('portfolio-theme');
-      } catch (e) {
-        // Fallback for sandboxed iframe environments
-      }
-      const initial = saved || root.dataset.theme || 'vivid';
-      root.dataset.theme = initial;
 
-      // Dropdown Theme Switcher logic
+      // 1. THE NAVIGATION FIX: Handle links inside the iframe safely
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="#"]');
+        if (link) {
+          e.preventDefault();
+          const targetId = link.getAttribute('href').slice(1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+
+      // 2. Theme Dropdown Logic
       const toggleBtn = document.getElementById('themeToggleBtn');
       const themeMenu = document.getElementById('themeMenu');
       const themeOptions = document.querySelectorAll('[data-theme-option]');
 
-      const updateActiveThemeUI = (theme) => {
-        themeOptions.forEach(btn => {
-          btn.classList.toggle('is-selected', btn.dataset.themeOption === theme);
-        });
-      };
       if (toggleBtn && themeMenu) {
-        updateActiveThemeUI(initial);
-
-        const toggleMenu = (shouldOpen) => {
-          const isOpen = shouldOpen !== undefined ? shouldOpen : !themeMenu.classList.contains('is-open');
-          themeMenu.classList.toggle('is-open', isOpen);
-          toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        };
-
-        toggleBtn.addEventListener('click', (e) => {
+        toggleBtn.onclick = (e) => {
           e.stopPropagation();
-          toggleMenu();
-        });
+          themeMenu.classList.toggle('is-open');
+        };
+        document.onclick = () => themeMenu.classList.remove('is-open');
 
-        document.addEventListener('click', (e) => {
-          if (!e.target.closest('.theme-dropdown-wrap')) {
-            toggleMenu(false);
-          }
-        });
-
-        themeOptions.forEach(button => {
-          button.addEventListener('click', () => {
-            const theme = button.dataset.themeOption;
-            root.dataset.theme = theme;
-            try { localStorage.setItem('portfolio-theme', theme); } catch (e) {}
-            updateActiveThemeUI(theme);
-            toggleMenu(false);
-          });
+        themeOptions.forEach(opt => {
+          opt.onclick = () => {
+            root.dataset.theme = opt.dataset.themeOption;
+            try { localStorage.setItem('portfolio-theme', root.dataset.theme); } catch(e) {}
+          };
         });
       }
 
-      // Nav scroll highlighting
+      // 3. Scroll Watcher for Active Nav state
       const navLinks = [...document.querySelectorAll('[data-nav]')];
-      const sections = [...document.querySelectorAll('[data-section]')];
-      const updateNav = () => {
-        const marker = window.scrollY + window.innerHeight * 0.28;
+      const sections = [...document.querySelectorAll('section[id]')];
+      window.addEventListener('scroll', () => {
         let current = 'home';
-        sections.forEach(section => { if (section.offsetTop <= marker) current = section.id; });
-        navLinks.forEach(link => link.classList.toggle('is-active', link.dataset.nav === current));
-      };
-      window.addEventListener('scroll', updateNav, { passive: true });
-      window.addEventListener('resize', updateNav);
-      updateNav();
-
-      // Project filter
-      const filterButtons = [...document.querySelectorAll('.filter-btn')];
-      const cards = [...document.querySelectorAll('.project-card')];
-      const emptyFilter = document.querySelector('.empty-filter');
-      filterButtons.forEach(button => button.addEventListener('click', () => {
-        const filter = button.dataset.filter;
-        filterButtons.forEach(item => item.classList.toggle('is-active', item === button));
-        let visible = 0;
-        cards.forEach(card => {
-          const tags = card.dataset.projectTags || '';
-          const show = filter === 'all' || tags.split('|').includes(filter);
-          card.hidden = !show;
-          if (show) visible += 1;
-        });
-        if (emptyFilter) emptyFilter.hidden = visible !== 0;
-      }));
+        const marker = window.scrollY + 100;
+        sections.forEach(s => { if (s.offsetTop <= marker) current = s.id; });
+        navLinks.forEach(l => l.classList.toggle('is-active', l.dataset.nav === current));
+      }, { passive: true });
     })();
-  </script>
+</script>
+
 </body>
 </html>
