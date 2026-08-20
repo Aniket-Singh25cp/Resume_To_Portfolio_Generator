@@ -3,88 +3,108 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Portfolio Generator</title>
+  <title>AI Resume Portfolio Generator</title>
   <link rel="stylesheet" href="launcher.css">
 </head>
 <body>
-  <!-- Landing Page -->
   <div id="creatorApp" class="creator-container">
     <header class="launcher-header">
-      <div class="badge">Bootcamp Project '26</div>
-      <h1>AI Resume to Portfolio</h1>
-      <p>Landing page to generate your instant portfolio.</p>
+      <div class="badge">AIML GLA Bootcamp '26</div>
+      <h1>AI Resume to Portfolio Generator</h1>
+      <p>Convert any resume text into an interactive portfolio website.</p>
     </header>
 
     <main class="launcher-card">
       <div class="option-grid">
-        <button id="useDefaultBtn" class="default-btn">Use Default Resume</button>
-        <div class="drop-zone">Drag & Drop .txt here</div>
+        <button type="button" class="default-btn" id="useDefaultBtn">
+          <strong>Use Default Resume</strong>
+          <span>Generate from resume.txt</span>
+        </button>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".txt" hidden>
+          <p><strong>Drag & Drop .txt</strong> or click</p>
+        </div>
       </div>
+      <div class="divider"><span>OR PASTE TEXT</span></div>
       <textarea id="resumeInput" placeholder="Paste resume text here..."></textarea>
-      <button id="generateBtn" class="submit-btn">Generate Portfolio</button>
-      <div id="statusBox" class="status-box" hidden>AI is working...</div>
+      <div class="actions">
+        <button type="button" class="submit-btn" id="generateBtn">Generate Portfolio</button>
+      </div>
+      <div id="statusBox" class="status-box" hidden>
+        <div class="spinner"></div>
+        <span>AI is working...</span>
+      </div>
+      <div id="errorBox" class="error-box" hidden></div>
     </main>
   </div>
 
-  <!-- Hidden Portfolio Preview -->
   <div id="portfolioViewer" class="portfolio-viewer" hidden>
-  <div class="viewer-bar">
-    <div class="viewer-left">
-      <span class="live-indicator"></span>
-      <span class="viewer-title">Live Portfolio</span> <!-- Changed here -->
+    <div class="viewer-bar">
+      <div class="viewer-left"><span class="live-indicator"></span><span>Live Portfolio</span></div>
+      <button type="button" id="exitViewerBtn" class="viewer-btn">← Back to Generator</button>
     </div>
-    <div class="viewer-actions">
-      <button type="button" id="exitViewerBtn" class="viewer-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        <span>Back to Generator</span>
-      </button>
-    </div>
+    <iframe id="portfolioFrame"></iframe>
   </div>
-  <iframe id="portfolioFrame" title="Live Preview"></iframe>
-</div>
 
-  <!-- Replace your current script in template.html with this -->
-<script>
-    (() => {
-      const root = document.documentElement;
+  <script>
+    const creatorApp = document.getElementById('creatorApp');
+    const portfolioViewer = document.getElementById('portfolioViewer');
+    const portfolioFrame = document.getElementById('portfolioFrame');
+    const generateBtn = document.getElementById('generateBtn');
+    const useDefaultBtn = document.getElementById('useDefaultBtn');
+    const statusBox = document.getElementById('statusBox');
+    const errorBox = document.getElementById('errorBox');
+
+    // Toggle logic
+    const showViewer = (html) => {
+      portfolioFrame.srcdoc = html;
+      creatorApp.hidden = true;
+      portfolioViewer.hidden = false;
+    };
+
+    document.getElementById('exitViewerBtn').onclick = () => {
+      portfolioViewer.hidden = true;
+      creatorApp.hidden = false;
+      portfolioFrame.srcdoc = '';
+    };
+
+    async function startGeneration(useDefault = false) {
+      errorBox.hidden = true;
+      const text = document.getElementById('resumeInput').value.trim();
       
-      // Theme Toggle Logic
-      const toggleBtn = document.getElementById('themeToggleBtn');
-      const themeMenu = document.getElementById('themeMenu');
-      const themeOptions = document.querySelectorAll('[data-theme-option]');
-
-      if (toggleBtn && themeMenu) {
-          toggleBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const isOpen = themeMenu.classList.contains('is-open');
-              themeMenu.classList.toggle('is-open', !isOpen);
-              toggleBtn.setAttribute('aria-expanded', !isOpen);
-          });
-
-          document.addEventListener('click', () => {
-              themeMenu.classList.remove('is-open');
-              toggleBtn.setAttribute('aria-expanded', 'false');
-          });
-
-          themeOptions.forEach(opt => {
-              opt.addEventListener('click', () => {
-                  const theme = opt.dataset.themeOption;
-                  root.dataset.theme = theme;
-                  localStorage.setItem('portfolio-theme', theme);
-              });
-          });
+      if (!useDefault && text.length < 10) {
+        errorBox.textContent = "Please paste a resume first.";
+        errorBox.hidden = false;
+        return;
       }
 
-      // Smooth Nav
-      const navLinks = [...document.querySelectorAll('[data-nav]')];
-      const sections = [...document.querySelectorAll('[data-section]')];
-      window.addEventListener('scroll', () => {
-          const marker = window.scrollY + 100;
-          let current = 'home';
-          sections.forEach(s => { if (s.offsetTop <= marker) current = s.id; });
-          navLinks.forEach(l => l.classList.toggle('is-active', l.dataset.nav === current));
-      }, { passive: true });
-    })();
-</script>
+      statusBox.hidden = false;
+      generateBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume_text: text, use_default: useDefault })
+        });
+
+        const data = await response.json();
+        if (data.html) {
+          showViewer(data.html);
+        } else {
+          throw new Error(data.error || "Generation failed.");
+        }
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.hidden = false;
+      } finally {
+        statusBox.hidden = true;
+        generateBtn.disabled = false;
+      }
+    }
+
+    generateBtn.onclick = () => startGeneration(false);
+    useDefaultBtn.onclick = () => startGeneration(true);
+  </script>
 </body>
 </html>

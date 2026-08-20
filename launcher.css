@@ -150,12 +150,11 @@ textarea {
 }
 
 .status-box {
-  margin-top: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.88rem;
+  gap: 10px;
   color: #b8ff36;
+  margin-top: 15px;
 }
 .spinner {
   width: 18px;
@@ -163,18 +162,17 @@ textarea {
   border: 2px solid rgba(184, 255, 54, 0.2);
   border-top-color: #b8ff36;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .error-box {
-  margin-top: 16px;
-  padding: 12px 16px;
-  background: rgba(255, 79, 46, 0.1);
-  border: 1px solid #ff4f2e;
-  border-radius: 6px;
-  color: #ff8b73;
-  font-size: 0.85rem;
+  background: rgba(255,0,0,0.1);
+  color: #ff5555;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+  font-size: 0.8rem;
 }
 
 .launcher-footer {
