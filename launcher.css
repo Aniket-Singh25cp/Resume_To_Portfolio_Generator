@@ -287,6 +287,62 @@ textarea {
   text-align: center;
   margin-bottom: 20px;
 }
+/* --- THEME SYNC FOR VIEWER BAR --- */
+
+/* Default (Vivid) */
+.portfolio-viewer[data-viewer-theme="vivid"] .viewer-bar {
+    background: #f8f7f2;
+    border-bottom-color: rgba(0,0,0,0.1);
+}
+.portfolio-viewer[data-viewer-theme="vivid"] .viewer-title { color: #111; }
+.portfolio-viewer[data-viewer-theme="vivid"] .viewer-btn { background: #ff4f2e; color: #fff; }
+
+/* Bold Theme (Yellow/Blue) */
+.portfolio-viewer[data-viewer-theme="bold"] .viewer-bar {
+    background: #f0c94a;
+    border-bottom-color: #15130f;
+}
+.portfolio-viewer[data-viewer-theme="bold"] .viewer-title { color: #15130f; }
+.portfolio-viewer[data-viewer-theme="bold"] .viewer-btn { background: #1e5eff; color: #fff; }
+
+/* Editorial Theme (Beige/Serif) */
+.portfolio-viewer[data-viewer-theme="editorial"] .viewer-bar {
+    background: #ebe5da;
+    border-bottom-color: rgba(0,0,0,0.1);
+}
+.portfolio-viewer[data-viewer-theme="editorial"] .viewer-title { color: #191817; }
+.portfolio-viewer[data-viewer-theme="editorial"] .viewer-btn { background: #9c5b43; color: #fff; }
+
+/* Dark Theme (Black/Lime) */
+.portfolio-viewer[data-viewer-theme="dark"] .viewer-bar {
+    background: #111;
+    border-bottom-color: rgba(255,255,255,0.1);
+}
+.portfolio-viewer[data-viewer-theme="dark"] .viewer-title { color: #b8ff36; }
+.portfolio-viewer[data-viewer-theme="dark"] .viewer-btn { background: #b8ff36; color: #000; }
+
+/* --- OTHER UI TWEAKS --- */
+
+.info-alert {
+  padding: 24px;
+  background: rgba(184, 255, 54, 0.03);
+  border: 1px dashed rgba(184, 255, 54, 0.3);
+  border-radius: 12px;
+  color: #b8ff36;
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.info-alert strong {
+    color: #fff;
+    display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
 
 .section-contact { padding: 8rem 7vw; }
 .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: start; }
