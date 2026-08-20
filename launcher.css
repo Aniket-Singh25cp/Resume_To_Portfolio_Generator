@@ -252,3 +252,38 @@ textarea {
   border: 0;
   background: #fff;
 }
+.mode-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 12px;
+  background: #1a1c23;
+  border: 1px solid #333;
+  color: #888;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.mode-btn.active {
+  background: #b8ff36;
+  color: #000;
+  border-color: #b8ff36;
+}
+
+.info-alert {
+  padding: 20px;
+  background: rgba(184, 255, 54, 0.05);
+  border: 1px dashed #b8ff36;
+  border-radius: 8px;
+  color: #b8ff36;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 20px;
+}

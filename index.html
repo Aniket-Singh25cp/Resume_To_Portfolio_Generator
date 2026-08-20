@@ -11,28 +11,29 @@
     <header class="launcher-header">
       <div class="badge">AIML GLA Bootcamp '26</div>
       <h1>AI Resume to Portfolio Generator</h1>
-      <p>Convert any resume text into an interactive portfolio website.</p>
     </header>
 
     <main class="launcher-card">
-      <div class="option-grid">
-        <button type="button" class="default-btn" id="useDefaultBtn">
-          <strong>Use Default Resume</strong>
-          <span>Generate from resume.txt</span>
-        </button>
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="fileInput" accept=".txt" hidden>
-          <p><strong>Drag & Drop .txt</strong> or click</p>
-        </div>
+      <div class="mode-selector">
+        <button type="button" class="mode-btn active" id="modePaste">Paste Resume Text</button>
+        <button type="button" class="mode-btn" id="modeDefault">Use Default (resume.txt)</button>
       </div>
-      <div class="divider"><span>OR PASTE TEXT</span></div>
-      <textarea id="resumeInput" placeholder="Paste resume text here..."></textarea>
+
+      <div id="pasteSection">
+        <textarea id="resumeInput" placeholder="Paste your resume text here..."></textarea>
+      </div>
+      
+      <div id="defaultSection" hidden>
+        <div class="info-alert">System will use the 'resume.txt' file located in the root directory.</div>
+      </div>
+
       <div class="actions">
         <button type="button" class="submit-btn" id="generateBtn">Generate Portfolio</button>
       </div>
+
       <div id="statusBox" class="status-box" hidden>
         <div class="spinner"></div>
-        <span>AI is working...</span>
+        <span>AI is processing your request...</span>
       </div>
       <div id="errorBox" class="error-box" hidden></div>
     </main>
@@ -47,33 +48,45 @@
   </div>
 
   <script>
-    const creatorApp = document.getElementById('creatorApp');
-    const portfolioViewer = document.getElementById('portfolioViewer');
-    const portfolioFrame = document.getElementById('portfolioFrame');
+    let useDefaultMode = false;
+
+    const btnPaste = document.getElementById('modePaste');
+    const btnDefault = document.getElementById('modeDefault');
+    const pasteSection = document.getElementById('pasteSection');
+    const defaultSection = document.getElementById('defaultSection');
     const generateBtn = document.getElementById('generateBtn');
-    const useDefaultBtn = document.getElementById('useDefaultBtn');
     const statusBox = document.getElementById('statusBox');
     const errorBox = document.getElementById('errorBox');
 
-    // Toggle logic
-    const showViewer = (html) => {
-      portfolioFrame.srcdoc = html;
-      creatorApp.hidden = true;
-      portfolioViewer.hidden = false;
+    // Switch to Paste Mode
+    btnPaste.onclick = () => {
+      useDefaultMode = false;
+      btnPaste.classList.add('active');
+      btnDefault.classList.remove('active');
+      pasteSection.hidden = false;
+      defaultSection.hidden = true;
+    };
+
+    // Switch to Default Mode
+    btnDefault.onclick = () => {
+      useDefaultMode = true;
+      btnDefault.classList.add('active');
+      btnPaste.classList.remove('active');
+      pasteSection.hidden = true;
+      defaultSection.hidden = false;
     };
 
     document.getElementById('exitViewerBtn').onclick = () => {
-      portfolioViewer.hidden = true;
-      creatorApp.hidden = false;
-      portfolioFrame.srcdoc = '';
+      document.getElementById('portfolioViewer').hidden = true;
+      document.getElementById('creatorApp').hidden = false;
     };
 
-    async function startGeneration(useDefault = false) {
+    async function generate() {
       errorBox.hidden = true;
       const text = document.getElementById('resumeInput').value.trim();
       
-      if (!useDefault && text.length < 10) {
-        errorBox.textContent = "Please paste a resume first.";
+      if (!useDefaultMode && text.length < 10) {
+        errorBox.textContent = "Please paste resume text first.";
         errorBox.hidden = false;
         return;
       }
@@ -85,17 +98,19 @@
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resume_text: text, use_default: useDefault })
+          body: JSON.stringify({ resume_text: text, use_default: useDefaultMode })
         });
 
         const data = await response.json();
         if (data.html) {
-          showViewer(data.html);
+          document.getElementById('portfolioFrame').srcdoc = data.html;
+          document.getElementById('creatorApp').hidden = true;
+          document.getElementById('portfolioViewer').hidden = false;
         } else {
           throw new Error(data.error || "Generation failed.");
         }
       } catch (err) {
-        errorBox.textContent = err.message;
+        errorBox.textContent = "Error: " + err.message;
         errorBox.hidden = false;
       } finally {
         statusBox.hidden = true;
@@ -103,8 +118,7 @@
       }
     }
 
-    generateBtn.onclick = () => startGeneration(false);
-    useDefaultBtn.onclick = () => startGeneration(true);
+    generateBtn.onclick = generate;
   </script>
 </body>
 </html>
