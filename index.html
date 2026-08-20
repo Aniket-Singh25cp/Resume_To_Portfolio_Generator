@@ -31,7 +31,7 @@
   <div class="viewer-bar">
     <div class="viewer-left">
       <span class="live-indicator"></span>
-      <span class="viewer-title">Live Portfolio</span>
+      <span class="viewer-title">Live Portfolio</span> <!-- Changed here -->
     </div>
     <div class="viewer-actions">
       <button type="button" id="exitViewerBtn" class="viewer-btn">
@@ -43,52 +43,48 @@
   <iframe id="portfolioFrame" title="Live Preview"></iframe>
 </div>
 
-  <script>
-    const creatorApp = document.getElementById('creatorApp');
-    const portfolioViewer = document.getElementById('portfolioViewer');
-    const portfolioFrame = document.getElementById('portfolioFrame');
-    const exitViewerBtn = document.getElementById('exitViewerBtn');
-    const generateBtn = document.getElementById('generateBtn');
+  <!-- Replace your current script in template.html with this -->
+<script>
+    (() => {
+      const root = document.documentElement;
+      
+      // Theme Toggle Logic
+      const toggleBtn = document.getElementById('themeToggleBtn');
+      const themeMenu = document.getElementById('themeMenu');
+      const themeOptions = document.querySelectorAll('[data-theme-option]');
 
-    // FIX: BACK TO GENERATOR
-    exitViewerBtn.addEventListener('click', () => {
-      portfolioViewer.hidden = true;
-      creatorApp.hidden = false;
-      portfolioFrame.srcdoc = '';
-    });
+      if (toggleBtn && themeMenu) {
+          toggleBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const isOpen = themeMenu.classList.contains('is-open');
+              themeMenu.classList.toggle('is-open', !isOpen);
+              toggleBtn.setAttribute('aria-expanded', !isOpen);
+          });
 
-    async function handleGenerate(useDefault = false) {
-      const statusBox = document.getElementById('statusBox');
-      statusBox.hidden = false;
-      generateBtn.disabled = true;
+          document.addEventListener('click', () => {
+              themeMenu.classList.remove('is-open');
+              toggleBtn.setAttribute('aria-expanded', 'false');
+          });
 
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            use_default: useDefault,
-            resume_text: document.getElementById('resumeInput').value
-          })
-        });
-        const data = await res.json();
-        if (data.html) {
-          creatorApp.hidden = true;
-          portfolioViewer.hidden = false;
-          portfolioFrame.srcdoc = data.html;
-        } else {
-          alert(data.error);
-        }
-      } catch (e) {
-        alert("Failed to connect to API");
-      } finally {
-        statusBox.hidden = true;
-        generateBtn.disabled = false;
+          themeOptions.forEach(opt => {
+              opt.addEventListener('click', () => {
+                  const theme = opt.dataset.themeOption;
+                  root.dataset.theme = theme;
+                  localStorage.setItem('portfolio-theme', theme);
+              });
+          });
       }
-    }
 
-    generateBtn.addEventListener('click', () => handleGenerate(false));
-    document.getElementById('useDefaultBtn').addEventListener('click', () => handleGenerate(true));
-  </script>
+      // Smooth Nav
+      const navLinks = [...document.querySelectorAll('[data-nav]')];
+      const sections = [...document.querySelectorAll('[data-section]')];
+      window.addEventListener('scroll', () => {
+          const marker = window.scrollY + 100;
+          let current = 'home';
+          sections.forEach(s => { if (s.offsetTop <= marker) current = s.id; });
+          navLinks.forEach(l => l.classList.toggle('is-active', l.dataset.nav === current));
+      }, { passive: true });
+    })();
+</script>
 </body>
 </html>
