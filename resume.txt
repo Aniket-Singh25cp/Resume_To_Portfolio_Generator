@@ -1,18 +1,41 @@
-Aarav Mehta
-Python Developer & Data Engineering Student
+JOHN DOE
+New York, NY 10001 | (555) 123-4567 | john.doe@email.com
+linkedin.com/in/johndoe | github.com/johndoe
 
-Computer science student focused on Python, databases and practical data engineering projects.
+PROFESSIONAL SUMMARY
+Dynamic and results-driven Software Engineer with over 4 years of experience designing, building, and deploying scalable web applications. Proven track record of improving system performance by 30% and leading cross-functional teams. Expert in full-stack development with a strong focus on clean code and agile methodologies.
 
-Skills
-Python, SQL, DBMS, HTML, JavaScript, Git
+SKILLS
+* Technical Skills: Python, Java, JavaScript, React, Node.js, SQL, AWS, Docker, Git
+* Core Competencies: Agile/Scrum, Full-Stack Development, System Architecture, REST APIs
+* Soft Skills: Cross-functional Collaboration, Problem Solving, Technical Mentorship
 
-Education
-B.Tech, GLA University, 2024-2028
+PROFESSIONAL EXPERIENCE
 
-Projects
-Resume Portfolio Generator — A Python application that converts resume text into a structured portfolio. Technologies: Python, Gemini API, HTML, CSS.
-Database Practice Suite — SQL and DBMS practice work covering joins and normalization. Technologies: SQL, DBMS.
+Software Engineer | TechSolutions Inc. – New York, NY
+January 2024 – Present
+* Designed and implemented a microservices architecture using Python and AWS, reducing server response times by 35%.
+* Led a team of 4 developers to build an e-commerce platform that generated $150K in revenue during the first month.
+* Automated CI/CD deployment pipelines using Docker and Jenkins, cutting deployment errors by 20%.
 
-Contact
-Email: aarav@example.com
-Availability: Open to internships
+Associate Web Developer | Innovations Lab – Austin, TX
+June 2022 – December 2023
+* Developed responsive front-end components using React, increasing mobile user engagement by 25%.
+* Optimized database queries in PostgreSQL, accelerating data retrieval times by 40% for over 50,000 active users.
+* Collaborated with UX/UI designers to revamp the primary client dashboard, leading to a 15% rise in customer satisfaction.
+
+EDUCATION
+
+Bachelor of Science in Computer Science
+State University, Austin, TX | Graduate: May 2022
+* Honors: Magna Cum Laude (GPA: 3.8/4.0), Dean's List (All Semesters)
+
+PROJECTS
+
+E-Commerce Analytics Dashboard | 2024
+* Built a real-time data visualization tool using Node.js and React to track daily sales metrics.
+* Integrated Stripe API for secure payment processing and implemented JWT for secure user authentication.
+
+CERTIFICATIONS
+* AWS Certified Solutions Architect – Amazon Web Services, 2025
+* Certified ScrumMaster (CSM) – Scrum Alliance, 2024
